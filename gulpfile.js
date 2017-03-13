@@ -18,6 +18,7 @@ var rename = require('gulp-rename');
 var size = require('gulp-size');
 var notify = require('gulp-notify');
 var watch = require('gulp-watch');
+var connect = require('gulp-connect-php');
 var color = require('gulp-color');
 
 
@@ -29,6 +30,27 @@ var handleError = function (err) {
 }
 
 // Minify JS
+gulp.task('js:dev', function() {
+        var s = size();
+        return gulp.src('src/js/*.js')
+            .pipe(plumber({ //dodaje obsługę błędów
+                errorHandler: handleError
+            }))
+            .pipe(sourcemaps.init()) //odpalam generowanie sourcemapy
+            .pipe(concat('scripts.js')) //łaczę pliki
+            .pipe(s) //pobieram rozmiar plików w stramie
+            .pipe(rename({suffix: '.min'})) //zmieniam nazwę
+            .pipe(sourcemaps.write('.')) //tworzę sourcemapę
+            .pipe(gulp.dest('dist/js')) //wszystko zapisuję w dist/js
+            .pipe(browserSync.stream()) //odpalam browserSync
+            .pipe(notify({ //i wypisuję komunikat
+                onLast: true,
+                message: function () {
+                    return 'Total JS size ' + s.prettySize;
+                }
+            }))
+    });
+
 gulp.task('js:prod', function () {
     var s = size();
     return gulp.src('src/js/*.js')
@@ -149,18 +171,20 @@ gulp.task('watch:dev', function () {
 //============================================    
 
 
-gulp.task('browser-sync', function () {
-    browserSync.init({
-        server: {
-            baseDir: "./dist"
-        }
+gulp.task('browser-sync-php', function() {
+        connect.server({
+            base : './dist'
+        }, function() {
+            browserSync({
+                proxy: '127.0.0.1:8000',
+                notify: false            
+            });
+        });
+
+        gulp.watch('**/*.php').on('change', function () {
+            browserSync.reload();
+        });
     });
-});
-
-gulp.watch('**/*.html').on('change', function () {
-    browserSync.reload();
-});
-
 
 
 //============================================
@@ -181,14 +205,14 @@ gulp.task('compile:prod', function () {
 });
 
 gulp.task('dev', function () {
-    gulp.start('sass:dev', 'js-lint', 'js:dev', 'watch:dev', 'browser-sync');
+    gulp.start('sass:dev', 'js-lint', 'js:dev', 'watch:dev', 'browser-sync-php');
     console.log(color('-------------------------------------------', 'YELLOW'));
     console.log(color('Rozpoczynamy pracę milordzie (DEV)', 'YELLOW'));
     console.log(color('-------------------------------------------', 'YELLOW'));
 });
 
 gulp.task('prod', function () {
-    gulp.start('sass:prod', 'js-lint', 'js:prod', 'watch:prod', 'browser-sync');
+    gulp.start('sass:prod', 'js-lint', 'js:prod', 'watch:prod', 'browser-sync-php');
     console.log(color('-------------------------------------------', 'YELLOW'));
     console.log(color('Rozpoczynamy pracę milordzie (PROD)', 'YELLOW'));
     console.log(color('-------------------------------------------', 'YELLOW'));
