@@ -7,7 +7,7 @@
     <title>KMI</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&amp;subset=latin-ext" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.min.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>css/style.min.css">
 </head>
 <body>
     <div class="container">
