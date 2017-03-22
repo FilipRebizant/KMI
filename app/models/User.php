@@ -2,6 +2,6 @@
 
 class User{
     
-    public $namel
+    public $name;
     
 }
