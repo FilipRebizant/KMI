@@ -1,10 +1,9 @@
 <?php 
 
-require_once '../src/start.php';
-
+require_once '../src/config.php';
 
 $projects = $db->query("
     SELECT * FROM projects;
-");
+")->fetchAll(PDO::FETCH_ASSOC);
 
-require VIEW_ROOT . '/templates/header.php'; 
+require PAGE_ROOT . '/home.php';
