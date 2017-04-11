@@ -1,0 +1,2 @@
+<hr>
+kod strony błędu
